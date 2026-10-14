@@ -1,9 +1,21 @@
 """RAG- Setup and and explore"""
 import requests
 
+#---------------------------------------------------------------------------------------------------
+#           DATABASE SETUP
+#---------------------------------------------------------------------------------------------------
+user_data= {
+    "Dhoni": "Dhoni is a well-known TV show host, known for his many appearances in kids entertainment industry",
+    "Bheem": "Bheem is a famous politician hailing from the state of Bihar, known for his policies and action against corruption.",
+    "Rajnikanth": "Rajnikanth is a professional cricketer, best known for his performance in 2023 World Cup",
+}
+
+#---------------------------------------------------------------------------------------------------
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
 MODEL_NAME = "gemma3:4b"
+
+context= ""
 
 def query_local_model(query):
     """Query the local model using the OLLAMA API."""
@@ -26,10 +38,19 @@ def query_local_model(query):
 
 query = "Tell me about Dhoni"
 
+#---------------------------------------------------------------------------------------------------
+#          Amatuer Solution
+#---------------------------------------------------------------------------------------------------
+for word in query.split():
+    if word in user_data:
+        context+=user_data[word]
 
-print("Query: ", query)
-json_response = query_local_model(query)
-print("\nResponse: ", json_response)
-reply = json_response["message"]["content"]
-print("\n\n\nReply:", reply)
+prompt = f"Based on the provided internal data, answer the query.\nQuery: {query}\n\nInternal User Data: {context}"
+print(f"\n\nPROMPT: {prompt}")
+response= query_local_model(prompt)
+reply= response["message"]["content"]
 
+
+print(f"\n\n\nModel Reply: {reply}")
+
+#---------------------------------------------------------------------------------------------------
