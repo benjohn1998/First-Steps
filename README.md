@@ -68,3 +68,23 @@ Once query arrives:
 4. Return that text
 
 `retrieve_text`: This function will create query embeddings and perform the search for best and closest match to return the result i.e. the answer to the query.
+
+
+# Complete RAG Pipeline using LangChain
+
+Required Installs:
+!pip install langchain -q
+!pip install langchain-text-splitters -q
+!pip install langchain-community -q
+
+`LangChain.py`: File to perform RAG using LangChain
+
+LangChain automatically imports FAISS. RAG implementation is much easier through LangChain.
+
+## Steps for retrieval
+1. Chunking: `RecursiveCharacterTextSplitter` will take the chunk size and the chunk overlap size for chunking
+2. Embedding Model: `SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-V2")` 
+3. FAISS Vectorstore
+4. A retriever function: `retrieve_text` to perform the search for content to match with the query
+
+Now give the context created to the local model and ask the model to answer the user query. This can help sort the clutter produced in context and give a clean final reply.

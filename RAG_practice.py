@@ -67,9 +67,9 @@ print(f"Indexed: {len(all_chunks)} chunks")
 
 def retrieve_text(query, top_k=3):
     query_emb= embedder.encode([query])
-    distances, indices = index.search(query_emb, top_k)
+    distances, indices = index.search(query_emb, top_k)     # Finding vectors closest to the query
     results = []
-    for i, dist in zip(indices[0], distances[0]):
+    for i, dist in zip(indices[0], distances[0]):           # Finding text associated with that closest vector
         results.append({"text": all_chunks[i], "distance": dist})
     return results
 
