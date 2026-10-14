@@ -1,5 +1,8 @@
 """RAG- Setup and and explore"""
 import requests
+from sentence_transformers import SentenceTransformer
+import faiss
+
 
 #---------------------------------------------------------------------------------------------------
 #           DATABASE SETUP
@@ -37,20 +40,44 @@ def query_local_model(query):
     return data
 
 query = "Tell me about Dhoni"
+print(f"Query: {query}")
 
 #---------------------------------------------------------------------------------------------------
-#          Amatuer Solution
+#          FAISS RETRIEVAL Solution
 #---------------------------------------------------------------------------------------------------
-for word in query.split():
-    if word in user_data:
-        context+=user_data[word]
+# 1. Chunk the data
 
-prompt = f"Based on the provided internal data, answer the query.\nQuery: {query}\n\nInternal User Data: {context}"
-print(f"\n\nPROMPT: {prompt}")
-response= query_local_model(prompt)
-reply= response["message"]["content"]
+all_chunks= list(user_data.values())
+print(f"All Chunks: {all_chunks}")
 
+#2. Create embeddings for the chunks
+embedder= SentenceTransformer("all-MiniLm-L6-V2")
+embeddings= embedder.encode(all_chunks, convert_to_tensor= True)
+print(len(embeddings), len(embeddings[0]))
+print(f"Embeddings: {embeddings[0]}")
 
-print(f"\n\n\nModel Reply: {reply}")
+#3. Create a FAISS index and add the embeddings
+dim= embeddings[0].shape[0]
+index= faiss.IndexFlatL2(dim)
+index.add(embeddings)
 
+print(f"Indexed: {len(all_chunks)} chunks")
+
+#4. Create an embedding for the query
+
+def retrieve_text(query, top_k=3):
+    query_emb= embedder.encode([query])
+    distances, indices = index.search(query_emb, top_k)
+    results = []
+    for i, dist in zip(indices[0], distances[0]):
+        results.append({"text": all_chunks[i], "distance": dist})
+    return results
+
+query = "Who is a sportsman?"
+results = retrieve_text(query)
+
+for result in results:
+    print(f"Distance:{result['distance']:.4f}") 
+    print(f"Text: {result['text']}")
+    print("----------")
 #---------------------------------------------------------------------------------------------------

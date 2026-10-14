@@ -35,3 +35,36 @@ print("PROMPT:\n" + prompt)
 
 But in reality, databases are huge, this solution is not practical in the real-world scenario.
 This requires some semantic level retrieval.
+
+
+## 3. Retrieval Using FAISS and Sentence Transformers
+
+Required Installs:
+!pip install PyPDF2 -q
+!pip install faiss-cpu -q
+!pip install sentence-transformers -q
+
+
+`FAISS (Faccebook AI Similarity Search):` It`s an open-source library created by Meta for efficient similarity search and clustering of dense vectors. In one lookup, it can quickly access all the vectors in a parallelized manner.
+    `IndexFlatL2:` Consists of all the embeddings in a 1-D format. It comes in single-level or multi-level tables.
+
+`PyPdf:` To read files
+
+`Sentence Transformer:` an encoder model for math tasks (NOT a language model).
+    `tensor:` allows the embedding to be a tensor, performing faster calculation on a TPU(Tensor Processing Unit)
+  
+
+### Steps for FAISS retrieval:
+
+Vectorize our database. 
+1. Chunk the data in the database
+2. Create embeddings for each chunks.
+3. Build an index to perform the search when a user query arrives.
+
+Once query arrives:
+1. Embed the query
+2. Finding vectors closest to that query(top_k) in the database
+3. Finding the text associated to the embeddings to those closest vectors
+4. Return that text
+
+`retrieve_text`: This function will create query embeddings and perform the search for best and closest match to return the result i.e. the answer to the query.
